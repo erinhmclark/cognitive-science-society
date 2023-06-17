@@ -12,6 +12,7 @@ bs4 = "^0.0.1"
 requests = "^2.31.0"
 mysql-connector-python = "^8.0.33"
 ratelimit = "^2.2.1"
+python-dotenv = "^1.0.0"
 
 
 [build-system]

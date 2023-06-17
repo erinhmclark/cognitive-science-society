@@ -13,7 +13,9 @@ from ratelimit import limits, sleep_and_retry
 from settings import (BASE_URL,
                       PAGE_LIMIT,
                       COG_SS_TABLE,
-                      MYSQL_CONFIG)
+                      MYSQL_CONFIG,
+                      RATE_LIMIT_CALLS,
+                      RATE_LIMIT_PERIOD)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -38,7 +40,7 @@ def get_older_posts(soup: BeautifulSoup) -> Optional[str]:
 
 
 @sleep_and_retry
-@limits(calls=100, period=300)
+@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def get_response(url: str) -> requests.Response:
     """
         Returns a response for the given URL.
