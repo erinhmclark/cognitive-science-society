@@ -2,20 +2,76 @@
 
 A scraper to collect the blog posts from https://cognitivesciencesociety.org/blog/ and insert the results into a database.
 
-## Project Setup
+# Cognitive Science Society Blog Scraper
 
-This project uses Poetry for dependency management. To set up the project:
+This project is a web scraper for the Cognitive Science Society blog. 
+It extracts blog details such as the title, date published, link, tags, and full text, and stores them in a MySQL database.
 
-1. Install Poetry if you haven't already (see https://python-poetry.org/docs/#installation for instructions).
-2. Clone the repository and navigate into the project directory.
-3. Run `poetry install` to install the project's dependencies.
-4. Activate the Poetry shell with `poetry shell`.
+## Features
 
-## Database Setup
+- Scrapes the Cognitive Science Society blog
+- Extracts blog details including the title, date of publication, link, tags, and full text
+- Stores the data in a MySQL database
+- Uses Beautiful Soup for HTML parsing
 
-Before you can run the scraper, you'll need to set up the database:
+## Getting Started
 
-1. Ensure you have MySQL installed and running.
-2. Run the `database_setup.py` script with Python (`python database_setup.py`). Make sure to do this within the Poetry shell, so that the necessary dependencies are available.
+These instructions will guide you through setting up the project and running the scraper on your local machine.
 
-With both of these steps completed, you should be ready to run the scraper.
+### Prerequisites
+
+This project requires:
+
+- Python 3.8+
+- Poetry for Python dependency management
+- MySQL 5.7+ 
+
+### Project Setup
+
+1. **Clone the Repository:** Clone this repository to your local machine:
+
+    ```
+    git clone https://github.com/erinhmclark/cognitive-science-society.git
+    cd projectname
+    ```
+
+2. **Install Poetry:** If you don't already have Poetry installed, you can install it with:
+
+    ```
+    curl -sSL https://install.python-poetry.org | python -
+    ```
+
+    For more detailed installation instructions, see the [Poetry documentation](https://python-poetry.org/docs/#installation).
+
+3. **Install Dependencies:** Install the project's dependencies with:
+
+    ```
+    poetry install
+    ```
+
+4. **Activate the Virtual Environment:** Start the Poetry shell with:
+
+    ```
+    poetry shell
+    ```
+
+### Database Setup
+
+1. **Install MySQL:** If you don't already have MySQL installed, you can download it from the [official website](https://dev.mysql.com/downloads/installer/).
+
+2. **Configure MySQL:** Make sure your MySQL server is running and correctly configured. You'll need to know your MySQL user name, password, host, and database name to connect to the database.
+
+3. **Run Database Setup Script:** Run the `database_setup.py` script with Python to set up the necessary database tables:
+
+    ```
+    python database_setup.py
+    ```
+
+### Running the Scraper
+
+With the setup complete, you can now run the scraper:
+```
+python cognitive_science_society_scraper.py 
+```
+
+# Possible Future
