@@ -60,8 +60,8 @@ This project requires:
 1. **Install MySQL:** If you don't already have MySQL installed, you can download it from the [official website](https://dev.mysql.com/downloads/installer/).
 
 2. **Configure MySQL:** Make sure your MySQL server is running and correctly configured. You'll need to know your MySQL user name, password, host, and database name to connect to the database.
-
-3. **Run Database Setup Script:** Run the `database_setup.py` script with Python to set up the necessary database tables:
+3. **Setting up Environment Variables:** Open the .env.template file and modify it with your secret variables. Save the modified .env.template file as .env. **NOTE:** This file must be named '.env' or the file name used must be added to the file '.gitignore' to ensure security of your credentials.
+4. **Run Database Setup Script:** Run the `database_setup.py` script with Python to set up the necessary database tables:
 
     ```
     python database_setup.py
