@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "cognitive-science-society"
+version = "0.1.0"
+description = "A scraper for the site: https://cognitivesciencesociety.org/blog/"
+authors = ["erinhmclark <erinhannahmary.clark@gmail.com>"]
+readme = "README.md"
+packages = [{include = "cognitive_science_society"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+bs4 = "^0.0.1"
+requests = "^2.31.0"
+mysql-connector-python = "^8.0.33"
+ratelimit = "^2.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
