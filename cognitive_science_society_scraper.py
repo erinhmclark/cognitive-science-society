@@ -7,9 +7,9 @@ from typing import Optional, Dict, Any, List
 import mysql.connector
 from mysql.connector.connection import MySQLConnection
 import requests
-from uuid import uuid4
+import hashlib
 from bs4 import BeautifulSoup
-from ratelimit import limits
+from ratelimit import limits, sleep_and_retry
 from settings import (BASE_URL,
                       PAGE_LIMIT,
                       COG_SS_TABLE,
@@ -21,7 +21,8 @@ logging.basicConfig(level=logging.INFO)
 
 def get_older_posts(soup: BeautifulSoup) -> Optional[str]:
     """
-    Returns URL of the older posts page if exists, otherwise None.
+    Returns URL of the older posts page if exists,
+    otherwise returns None to end the scraper.
 
     Args:
         soup (BeautifulSoup): Soup object for the current page.
@@ -36,20 +37,27 @@ def get_older_posts(soup: BeautifulSoup) -> Optional[str]:
         return None
 
 
+@sleep_and_retry
 @limits(calls=100, period=300)
-def get_soup(url: str) -> BeautifulSoup:
+def get_response(url: str) -> requests.Response:
     """
-    Returns a BeautifulSoup object for a given URL.
+        Returns a response for the given URL.
+        Implements rate limiting, sleep and retry.
 
-    Args:
-        url (str): URL to scrape.
+        Args:
+            url (str): URL to scrape.
 
-    Returns:
-        BeautifulSoup: BeautifulSoup object for the provided URL.
-    """
+        Returns:
+            requests.Response: A Response object containing server's response to the HTTP request.
+
+        Raises:
+            Exception: If the API response status code is not 200.
+        """
     response = requests.get(url)
     response.raise_for_status()
-    return BeautifulSoup(response.text, 'html.parser')
+    if response.status_code != 200:
+        raise Exception('API response: {}'.format(response.status_code))
+    return response
 
 
 def get_blog_posts(soup: BeautifulSoup) -> Optional[List[BeautifulSoup]]:
@@ -100,12 +108,15 @@ def get_blog_details(post: BeautifulSoup) -> Dict[str, Any]:
     date_published = post.find('span', {'class': 'published'}).text
     date_published_clean = convert_date(date_published, '%b %d, %Y')
     link = post.h2.a['href']
+    hash_object = hashlib.sha256(link.encode())
+    entry_id = hash_object.hexdigest()[:16]
     tags = [tag.text for tag in post.find('p', {'class': 'post-meta'}).findAll('a')]
     tags_string = ', '.join(tags)
-    blog_soup = get_soup(link)
+    blog_response = get_response(link)
+    blog_soup = BeautifulSoup(blog_response.text, 'html.parser')
     full_text = blog_soup.find('div', {'class': 'et_pb_row et_pb_row_2_tb_body'}).text
     data = {
-        'entry_id': str(uuid4()),
+        'entry_id': entry_id,
         'title': title,
         'date_published': date_published_clean,
         'link': link,
@@ -132,16 +143,15 @@ def insert_into_database(blog_details: Dict[str, Any], conn: MySQLConnection) ->
         conn (MySQLConnection): Database connection object.
     """
     query = f"""
-        INSERT INTO {COG_SS_TABLE} (entry_id, updated, title, date_published, link, tags, full_text) 
-        VALUES (%(entry_id)s, NOW(), %(title)s, %(date_published)s, %(link)s, %(tags)s, %(full_text)s)
+        INSERT INTO {COG_SS_TABLE} (entry_id, title, date_published, link, tags, full_text) 
+        VALUES (%(entry_id)s, %(title)s, %(date_published)s, %(link)s, %(tags)s, %(full_text)s)
         AS new
         ON DUPLICATE KEY UPDATE 
             title = new.title, 
             date_published = new.date_published,
             link = new.link,
             tags = new.tags,
-            full_text = new.full_text,
-            updated = NOW()
+            full_text = new.full_text
     """
 
     with conn.cursor() as cursor:
@@ -158,7 +168,8 @@ def scrape_css_blog(url: str) -> None:
         url (str): URL of the blog to scrape.
     """
     for i in range(PAGE_LIMIT):
-        soup = get_soup(url)
+        page_response = get_response(url)
+        soup = BeautifulSoup(page_response.text, 'html.parser')
         blog_posts = get_blog_posts(soup)
         for blog in blog_posts:
             try:
