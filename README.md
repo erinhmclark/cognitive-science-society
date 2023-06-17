@@ -73,5 +73,3 @@ With the setup complete, you can now run the scraper:
 ```
 python cognitive_science_society_scraper.py 
 ```
-
-# Possible Future
