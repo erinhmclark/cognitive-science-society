@@ -114,7 +114,7 @@ def get_blog_details(post: BeautifulSoup) -> Dict[str, Any]:
     tags_string = ', '.join(tags)
     blog_response = get_response(link)
     blog_soup = BeautifulSoup(blog_response.text, 'html.parser')
-    full_text = blog_soup.find('div', {'class': 'et_pb_row et_pb_row_2_tb_body'}).text
+    full_text = blog_soup.find('div', {'class': 'et_pb_row et_pb_row_2_tb_body'}).text.strip()
     data = {
         'entry_id': entry_id,
         'title': title,
