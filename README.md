@@ -73,3 +73,15 @@ With the setup complete, you can now run the scraper:
 ```
 python cognitive_science_society_scraper.py 
 ```
+
+## Potential Issues and Fixes
+Here are some common issues you might run into and their possible solutions:
+
+### Connection Issues:
+If you encounter a connection issue with the database, please check your .env file to ensure your MySQL credentials are correct. Remember to update your .env file whenever your MySQL credentials change. If the issue persists, ensure your MySQL server is running.
+
+### HTTP Errors:
+If you're facing HTTP errors while making requests to the blog URL, ensure that the website is up and running. If you're receiving HTTP 429 errors, this means your requests are being rate-limited. Try reducing the frequency of the requests by altering the `RATE_LIMIT_CALLS` value in the `settings.py`..
+
+### Extraction Issues:
+In case of extraction issues, the HTML of the website may have changed. The current scraping code relies on specific HTML tags and classes to find information and if these have changed the scraper will need to be updated.
